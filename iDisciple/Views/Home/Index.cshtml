@@ -1,0 +1,84 @@
+﻿<!--
+Neal Lowrey
+404-514-3668
+lowrey.neal@gmail.com
+iDisciple test 1-19-2018    
+-->
+
+<!-- only using inline when style is simple and look same 
+     regardless if style changes based on responsive width
+-->
+<style>
+   body{
+        background-color:aliceblue;
+    }
+    #FolkList {
+        display:inline-block;
+        vertical-align:top;
+        padding-left:5px;
+    }
+    #folks {
+        overflow-y:hidden;
+    }
+    #bio {
+        display: inline-block;
+        vertical-align: top;
+        margin-left: 5px;
+        width: 50%;
+        height: 300px;
+        padding: 5px;
+        overflow-y: auto;
+        border: 1px solid #cccccc;
+        background-color: white;
+    }
+</style>
+    <h3 style="text-align:center">iDisciple Famous Folks</h3>
+    <input type="checkbox" id="polsOnly" class="inputstl" style="margin-left:5px;" /><label style="margin-left:5px;position:relative;top:-2px;">Only Show Politicians</label>
+    <p>
+    <div id="FolkList"></div>
+    <div id="bio"></div>
+
+<script>
+    //array to fast load bio on item selected
+    var gFolks = null;
+
+    $(function () {
+        //initial load
+        getList("0");
+
+        $("#polsOnly").on("change", function () {
+            var isPols = $(this).is(":checked") ? "1" : "0";
+            getList(isPols);
+        });
+
+    });
+
+    function getList(onlyPols) {
+
+        $.get('Home/GetList', {  onlyPols }, function (data) {
+        
+            var txt = '<select id="folks" size=17 class="form-control inputstl">';
+
+            var len = data.length;
+            for (var i = 0; i < len; i++) {
+                var folk = data[i];
+                txt += '<option  value="' + i + '">' + folk.FirstName + ' ' + folk.LastName + ' : ' + folk.BirthLocation + '</option>';
+            }
+
+            txt += '</select>';
+           
+            $('#FolkList').html(txt);
+
+            $("#bio").html("");
+
+            gFolks = data;
+            //dynamic so have to rebind event
+            $("#folks").off("change").on("change", function () {
+                var ix = $("#folks").val();
+                $("#bio").html(gFolks[ix].Bio);
+            });
+
+        });
+    }
+
+</script>
